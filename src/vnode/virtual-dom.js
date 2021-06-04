@@ -23,36 +23,48 @@ export function vNode(tag, data, children, $el) {
  * @returns Element
  */
 export function createElement(vNode) {
+  if (!vNode) return;
   let el;
-  if (vNode.tag === "") {
-    el = document.createDocumentFragment();
-    if (Array.isArray(vNode.children) && vNode.children.length > 0) {
-      vNode.children.forEach((val) => {
-        el.appendChild(createElement.call(this, val));
-      });
-    }
-  } else if (vNode.tag === "textNode") {
+  if (vNode.tag === "textNode") {
     el = document.createTextNode(vNode.children[0]);
   } else {
     el = document.createElement(vNode.tag);
     for (const key in vNode.data) {
-      // [TODO] 绑定事件
       if (vNode.data.hasOwnProperty(key)) {
-        if (key === "click") {
-          el.addEventListener("click", this[vNode.data[key]].bind(this), false);
-        } else if (key === "input") {
-          el.value = this[vNode.data[key]];
-          el.addEventListener(
-              "input",
-              (e) => {
-                this[vNode.data[key]] = e.target.value;
-              },
-              false
-          );
-        } else {
+        if (key !== "directives") {
           el.setAttribute(key, vNode.data[key]);
         }
       }
+    }
+    // [TODO] 绑定事件
+    if (vNode.data.directives) {
+      vNode.data.directives.forEach((directive) => {
+        switch (directive.name) {
+          case "click":
+            el.addEventListener("click", this[directive.exp].bind(this), false);
+            break;
+          case "model":
+            el.value = this[directive.exp];
+            el.addEventListener(
+                "input",
+                (e) => {
+                  this[directive.exp] = e.target.value;
+                },
+                false
+            );
+            break;
+          case "show":
+            const originDisplay =
+                el.style.display === "none" ? "" : el.style.display;
+            el.style.display = this[directive.exp] ? originDisplay : "none";
+            break;
+          case "html":
+            el.innerHTML = directive.value;
+            break;
+          default:
+            break;
+        }
+      });
     }
     if (Array.isArray(vNode.children) && vNode.children.length > 0) {
       vNode.children.forEach((val) => {
@@ -68,8 +80,8 @@ export function createElement(vNode) {
 
 export function patchVnode(oldVnode, vnode) {
   vnode.$el = oldVnode.$el;
-  var oldCh = oldVnode.children;
-  var ch = vnode.children;
+  let oldCh = oldVnode.children;
+  let ch = vnode.children;
   // 1. 文本节点都一样
   if (oldVnode.tag === "textNode" || vnode.tag === "textNode") {
     if (oldVnode.children[0] !== vnode.children[0]) {
@@ -93,7 +105,12 @@ export function patchVnode(oldVnode, vnode) {
         if (isUndef(newData[key])) {
           oldVnode.$el.removeAttribute(oldData[key]);
         } else if (newData[key] !== oldData[key]) {
-          oldVnode.$el.setAttribute(key, newData[key]);
+          // 指令
+          if (key === "directives") {
+            directivesDiff(newData[key], oldVnode);
+          } else {
+            oldVnode.$el.setAttribute(key, newData[key]);
+          }
         }
       }
     }
@@ -110,15 +127,16 @@ export function patchVnode(oldVnode, vnode) {
  * @param {*} newCh 新子元素
  */
 export function updateChildren(parentElm, oldCh, newCh) {
-  if (oldCh) var oldStartIdx = 0;
-  var newStartIdx = 0;
-  var oldEndIdx = oldCh.length - 1;
-  var oldStartVnode = oldCh[0];
-  var oldEndVnode = oldCh[oldEndIdx];
-  var newEndIdx = newCh.length - 1;
-  var newStartVnode = newCh[0];
-  var newEndVnode = newCh[newEndIdx];
-  var oldKeyToIdx, idxInOld, vnodeToMove;
+  let oldStartIdx;
+  if (oldCh) oldStartIdx = 0;
+  let newStartIdx = 0;
+  let oldEndIdx = oldCh.length - 1;
+  let oldStartVnode = oldCh[0];
+  let oldEndVnode = oldCh[oldEndIdx];
+  let newEndIdx = newCh.length - 1;
+  let newStartVnode = newCh[0];
+  let newEndVnode = newCh[newEndIdx];
+  let oldKeyToIdx, idxInOld, vnodeToMove;
   while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
     if (isUndef(oldStartVnode)) {
       oldStartVnode = oldCh[++oldStartIdx];
@@ -173,4 +191,27 @@ export function updateChildren(parentElm, oldCh, newCh) {
   } else if (newStartIdx > newEndIdx) {
     removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
   }
+}
+
+function directivesDiff(directives, oldVnode) {
+  directives.forEach((directive) => {
+    // v-show diff
+    switch (directive.name) {
+      case "show":
+        const originDisplay =
+            oldVnode.$el.style.display === "none"
+                ? ""
+                : oldVnode.$el.style.display;
+        oldVnode.$el.style.display = directive.value ? originDisplay : "none";
+
+        break;
+      case "html":
+        if (oldVnode.$el.innerHTML !== directive.value) {
+          oldVnode.$el.innerHTML = directive.value;
+        }
+        break;
+      default:
+        break;
+    }
+  });
 }
