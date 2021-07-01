@@ -8,9 +8,9 @@ export function isUndef(v) {
 // vnode类型是否一样
 export function sameVnode(a, b) {
   return (
-    a.data.key === b.data.key &&
-    a.tag === b.tag &&
-    isDef(a.data) === isDef(b.data)
+      a.data.key === b.data.key &&
+      a.tag === b.tag &&
+      isDef(a.data) === isDef(b.data)
   );
 }
 /**
@@ -39,8 +39,8 @@ export function dataChanged(oldData, newData) {
 }
 
 export function findIdxInOld(node, oldCh, start, end) {
-  for (let i = start; i < end; i++) {
-    let c = oldCh[i];
+  for (var i = start; i < end; i++) {
+    var c = oldCh[i];
     if (isDef(c) && sameVnode(node, c)) {
       return i;
     }
@@ -48,8 +48,8 @@ export function findIdxInOld(node, oldCh, start, end) {
 }
 
 export function createKeyToOldIdx(children, beginIdx, endIdx) {
-  let i, key;
-  let map = {};
+  var i, key;
+  var map = {};
   for (i = beginIdx; i <= endIdx; ++i) {
     key = children[i].data.key;
     if (isDef(key)) {
