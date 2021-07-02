@@ -29,7 +29,7 @@ parcel index.html
 - [x] `Diff更新`
 - [x] `{{ data }}` or `{{ data + 'test' }}` or `{{ fn(data) }}`
 - [x] `v-for` // `v-for="(item, index) in list"` or `v-for="(item, index) in 10"` or `v-for="(item, index) in 'string'"`
-- [x] `v-if`
+- [x] `v-if` `v-else-if` `v-else`
 - [x] `v-show`
 - [x] `v-html`
 - [x] `v-model`
@@ -40,3 +40,6 @@ parcel index.html
 - [x] `:class`
 - [x] `:style`
 
+# 补充
+
+`虚拟dom` 不懂的可以看看我之前发的文章(相关代码相比现在有部分改动)：http://www.wclimb.site/2020/03/19/simple-virtual-dom/
