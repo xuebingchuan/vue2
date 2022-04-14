@@ -4,7 +4,8 @@ export default class Observer {
   constructor(value) {
     this.value = value;
     this.dep = new Dep();
-
+    this.def(value, "__ob__", this);
+    this.walk(value);
   }
   walk(data) {
     Object.keys(data).forEach((key) => {

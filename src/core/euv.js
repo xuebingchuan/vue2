@@ -15,7 +15,9 @@ export default class Euv {
       this.proxy(key);
     });
     new Observer(this.$data);
-
+    this.initComputed(this);
+    this.initMethods(this);
+    this.initWatch(this);
     this.callHook("created");
     new Complie(this.$el, this);
   }
@@ -45,10 +47,10 @@ export default class Euv {
       const userDef = computed[key];
       const getter = typeof userDef === "function" ? userDef : userDef.get;
       watchers[key] = new Watcher(
-        vm,
-        getter || noop,
-        noop,
-        computedWatcherOptions
+          vm,
+          getter || noop,
+          noop,
+          computedWatcherOptions
       );
       if (!(key in vm)) {
         const getterFn = this.defineComputed(key);
@@ -67,11 +69,11 @@ export default class Euv {
     const watchers = (vm._watchWatchers = Object.create(null));
     Object.keys(this.$option.watch || {}).forEach((val) => {
       watchers[val] = new Watcher(
-        vm,
-        () => {
-          return this[val];
-        },
-        this.$option.watch[val]
+          vm,
+          () => {
+            return this[val];
+          },
+          this.$option.watch[val]
       );
     });
   }

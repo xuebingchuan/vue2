@@ -2,12 +2,18 @@ let uidDep = 0;
 export default class Dep {
   static target = null;
   static targetStack = [];
-
+  static pushTarget = function(target) {
+    Dep.targetStack.push(target);
+    Dep.target = target;
+  };
   static popTarget = function() {
     Dep.targetStack.pop();
     Dep.target = Dep.targetStack[Dep.targetStack.length - 1];
   };
-
+  constructor() {
+    this.id = uidDep++;
+    this.subs = [];
+  }
   addSub(watcher) {
     this.subs.push(watcher);
   }
@@ -26,6 +32,7 @@ export default class Dep {
   }
   notify() {
     const subs = this.subs.slice(); // 浅拷贝，不然会造成死循环
+    console.log(subs);
     for (let i = 0; i < subs.length; i++) {
       subs[i].update();
     }
