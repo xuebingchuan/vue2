@@ -17,6 +17,8 @@ new Euv({
     style: { fontSize: "30px", color: "#ffff" },
     ifValue: false,
     elifValue: true,
+    todolist: [1, 2, 3],
+    todoinput: "",
   },
   computed: {
     hello() {
@@ -28,16 +30,32 @@ new Euv({
       console.log("watch", val, oldVal);
     },
     modelMessage(val, oldVal) {
-      console.log("watch", val, oldVal);
+      console.log("watch->", "newVal:", val, ", old:", oldVal);
     },
   },
   mounted() {
     setTimeout(() => {
+      console.log("old->", JSON.stringify(this.list));
+      this.$nextTick(() => {
+        console.log("new->", JSON.stringify(this.list));
+      });
+      this.$nextTick().then(() => {
+        console.log("new->", JSON.stringify(this.list));
+      });
       this.list = [11, 22];
     }, 1500);
   },
+  beforeUpdate() {
+    // console.log("beforeUpdate");
+  },
+  updated() {
+    console.log("updated");
+  },
   methods: {
-    fn() {
+    add() {
+      this.todolist.push(this.todoinput);
+    },
+    fn(a) {
       console.log("fn click");
       this.show = !this.show;
       this.ok = !this.ok;
@@ -51,6 +69,9 @@ new Euv({
             color: "#ccc",
             fontSize: "20px",
           };
+    },
+    todoFn(index, $event) {
+      console.log("todolist", index, $event);
     },
   },
 });

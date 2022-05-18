@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 module.exports = {
   mode: "production",
+  mode: "development",
   entry: "./src/main.js",
   module: {
     rules: [
@@ -33,3 +34,4 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
   },
 };
+
