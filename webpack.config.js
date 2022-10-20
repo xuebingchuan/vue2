@@ -1,10 +1,10 @@
 const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 module.exports = {
   mode: "production",
-  mode: "development",
-  entry: "./src/main.js",
+  entry: {
+    euv: "./src/core/euv.js",
+  },
   module: {
     rules: [
       {
@@ -21,17 +21,12 @@ module.exports = {
       },
     ],
   },
-  plugins: [
-    new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({ template: "index.html" }),
-  ],
-  devServer: {
-    noInfo: true,
-    open: true,
-  },
+  plugins: [new CleanWebpackPlugin()],
   output: {
-    filename: "[name].[hash].js",
-    path: path.resolve(__dirname, "dist"),
+    filename: "[name].min.js",
+    libraryTarget: "umd",
+    libraryExport: "default",
+    library: "Euv",
+    path: path.resolve(__dirname, "lib"),
   },
 };
-
