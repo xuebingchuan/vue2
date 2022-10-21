@@ -1,8 +1,8 @@
 {
-  "name": "euv",
-  "version": "1.0.0",
+  "name": "xue-mini-vue",
+  "version": "1.2.2",
   "description": "a simple vue",
-  "main": "src/main.js",
+  "main": "lib/euv.min.js",
   "scripts": {
     "dev": "webpack-dev-server --config webpack.config.js",
     "build-demo": "webpack --config webpack.config.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/wclimb/euv.git"
+    "url": "git+https://github.com/xuebingchuan/xue-mini-vue.git"
   },
   "keywords": [],
   "author": "wclimb",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/wclimb/euv/issues"
+    "url": "https://github.com/xuebingchuan/xue-mini-vue/issues"
   },
-  "homepage": "https://github.com/wclimb/euv#readme",
+  "homepage": "https://github.com/xuebingchuan/xue-mini-vue#readme",
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/plugin-proposal-class-properties": "^7.8.3",
