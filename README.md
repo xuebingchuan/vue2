@@ -1,6 +1,6 @@
 # euv
 
-why euv? because:
+why euv? because:  
 ```js
 'vue'.split('').sort().join('') // euv
 ```
@@ -32,8 +32,7 @@ npm run dev
 - [x] `v-show`
 - [x] `v-html`
 - [x] `v-model`
-- [x]  `@click` `v-on:click` 事件(支持绑定其他事件) `@click="fn('a',$event)"` `@click="fn"` `@click="show = false"` `@click="function(){console.log(1)}"`
-- [x] `methods` 方法
+- [x] `v-click` `@click` 点击事件
 - [x] `computed` 计算属性
 - [x] `watch` 监听
 - [x] `beforeCreate`、`created`、`beforeMount`、`mounted`、`beforeUpdate`、`updated`
@@ -41,6 +40,6 @@ npm run dev
 - [x] `:style`
 - [x] `$nextTick`
 
-[comment]: <> (# 补充)
+# 补充
 
-[comment]: <> (`虚拟dom` 不懂的可以看看我之前发的文章&#40;相关代码相比现在有部分改动&#41;：http://www.wclimb.site/2020/03/19/simple-virtual-dom/)
+`虚拟dom` 不懂的可以看看我之前发的文章(相关代码相比现在有部分改动)：http://www.wclimb.site/2020/03/19/simple-virtual-dom/

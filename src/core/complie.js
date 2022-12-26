@@ -16,6 +16,7 @@ export default class Complie {
     `;
     // 把v-if else的 @elif@ 替换成空节点
     vNodeFnStr = vNodeFnStr.replace(/@elif@/g, "_emptyNode()");
+
     // 将虚拟dom的字符串转函数，以后每次都拿这个函数重新生成虚拟dom，因为结构是不会变的
     this.$vm.$render = new Function(vNodeFnStr);
     // 生成虚拟dom
@@ -38,14 +39,14 @@ export default class Complie {
   }
   initWatcher() {
     new Watcher(
-        this.$vm,
-        function() {
-          // 渲染新的虚拟dom，进行diff
-          const render = this.$render.call(this, this);
-          patchVnode(this.oldVnode, render);
-          this.oldVnode = render;
-        },
-        () => {}
+      this.$vm,
+      function() {
+        // 渲染新的虚拟dom，进行diff
+        const render = this.$render.call(this, this);
+        patchVnode(this.oldVnode, render);
+        this.oldVnode = render;
+      },
+      () => {}
     );
   }
   /**
@@ -74,11 +75,11 @@ export default class Complie {
       let value = textConetent;
       if (reg.test(textConetent)) {
         value =
-            "'" +
-            textConetent.replace(/\n/g, "\\n").replace(reg, (match, val) => {
-              return "' + (" + val + ") + '";
-            }) +
-            "'";
+          "'" +
+          textConetent.replace(/\n/g, "\\n").replace(reg, (match, val) => {
+            return "' + " + val + " + '";
+          }) +
+          "'";
       } else {
         value = `'${value}'`.replace(/\n/g, "\\n");
       }
@@ -103,28 +104,27 @@ export default class Complie {
         // 收集directive
         const name = this.getDirectiveName(attr.name);
         if (!attrData["directives"]) attrData["directives"] = [];
-        // 处理事件
-        if (this.isEventDirective(attr.name)) {
-          this.handleEvent(attr, attrData);
-        } else {
-          attrData["directives"].push({
-            name,
-            value:
-                name !== "for" && name !== "else"
-                    ? "$" + attr.value + "$"
-                    : attr.value, // 用 $value$ 占位，以便后面可以把引号去掉 "a" -> a
-            exp: attr.value,
-          });
-        }
+        attrData["directives"].push({
+          name,
+          value:
+            name !== "for" && name !== "else"
+              ? "$" + attr.value + "$"
+              : attr.value, // 用 $value$ 站位，以便后面可以把引号去掉 "a" -> a
+          exp: attr.value,
+        });
       }
     });
+
     // 初始化vnode
     let vNodeStr = `_createEle('${node.nodeName.toLowerCase()}', ${JSON.stringify(
-        attrData
+      attrData
     )}, ${children})`;
 
     // value去除引号，方便直接访问到值，不然就是一个字符串
-    vNodeStr = vNodeStr.replace(/['"]\$(.*?)\$['"]/g, "$1"); //"a" -> a
+    vNodeStr = vNodeStr.replace(
+      /"value":(.*)?['"]\$(.*)?\$['"]/g,
+      '"value":$2'
+    ); //"a" -> a
     let elseif;
     // 单独处理v-for和v-if
     for (let i = 0; i < attribute.length; i++) {
@@ -135,9 +135,9 @@ export default class Complie {
         if (name === "for") {
           const params = attr.value.split(/\s+in\s+/);
           vNodeStr = `_listEle(${params[1]}, function ${
-              /\(\w+(\s+)?\,(\s+)?\w+\)/.test(params[0])
-                  ? params[0] // v-for="(item,index) in list"
-                  : "(" + params[0] + ")" // v-for="item in list"
+            /\(\w+(\s+)?\,(\s+)?\w+\)/.test(params[0])
+              ? params[0] // v-for="(item,index) in list"
+              : "(" + params[0] + ")" // v-for="item in list"
           } { return ${vNodeStr} })`;
           // v-if
         } else if (name === "if") {
@@ -152,38 +152,11 @@ export default class Complie {
     // 上一个虚拟dom存在if else模版
     if (vNodeChildren.length - 1 >= 0 && elseif) {
       vNodeChildren[vNodeChildren.length - 1] = vNodeChildren[
-      vNodeChildren.length - 1
-          ].replace(/@elif@/g, elseif);
+        vNodeChildren.length - 1
+      ].replace(/@elif@/g, elseif);
     } else {
       vNodeChildren.push(vNodeStr);
     }
-  }
-  handleEvent(attr, attrData) {
-    const fnExpRE = /^([\w$_]+|\([^)]*?\))\s*=>|^function(?:\s+[\w$]+)?\s*\(/;
-    const isFunctionExpression = fnExpRE.test(attr.value);
-    const simplePathRE = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*|\['[^']*?']|\["[^"]*?"]|\[\d+]|\[[A-Za-z_$][\w$]*])*$/;
-    const isMethodPath = simplePathRE.test(attr.value);
-    const isFunctionInvocation = simplePathRE.test(
-        attr.value.replace(/\([^)]*?\);*$/, "")
-    );
-    const name = this.getDirectiveName(attr.name);
-    attrData["directives"].push({
-      name,
-      value:
-          isMethodPath || isFunctionExpression // fn、function(){}
-              ? `$${attr.value}$`
-              : `$function ($event) {  ${
-                  isFunctionInvocation ? "return " + attr.value : attr.value // a = 1、fn(a, $event)
-              }}$`,
-      exp: attr.value,
-      isEvent: true,
-    });
-  }
-  /**
-   * 事件指令
-   */
-  isEventDirective(attr) {
-    return /(^@|^v-on:)\w+/.test(attr);
   }
   /**
    * 是否是指令
@@ -195,7 +168,7 @@ export default class Complie {
    * 获取指令名
    */
   getDirectiveName(attr) {
-    return attr.replace(/(?:^v-|^:|^@|^v-on:)(\w+)/, "$1");
+    return attr.replace(/(?:^v-|^:|^@)(\w+)/, "$1");
   }
   /**
    * 获取attr数据

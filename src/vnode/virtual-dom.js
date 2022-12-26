@@ -38,49 +38,42 @@ export function createElement(vNode) {
     //  指令初始化
     if (vNode.data && vNode.data.directives) {
       vNode.data.directives.forEach((directive) => {
-        if (directive.isEvent) {
-          el.addEventListener(
-              directive.name,
-              ($event) => {
-                return directive.value.call(this, $event);
+        switch (directive.name) {
+          case "click":
+            el.addEventListener("click", this[directive.exp].bind(this), false);
+            break;
+          case "model":
+            el.value = this[directive.exp];
+            el.addEventListener(
+              "input",
+              (e) => {
+                this[directive.exp] = e.target.value;
               },
               false
-          );
-        } else {
-          switch (directive.name) {
-            case "model":
-              el.value = this[directive.exp];
-              el.addEventListener(
-                  "input",
-                  (e) => {
-                    this[directive.exp] = e.target.value;
-                  },
-                  false
-              );
-              break;
-            case "show":
-              const originDisplay =
-                  el.style.display === "none" ? "" : el.style.display;
-              el.style.display = this[directive.exp] ? originDisplay : "none";
-              break;
-            case "html":
-              el.innerHTML = directive.value;
-              break;
-            case "class":
-              const cur = " " + (el.getAttribute("class") || "") + " ";
-              if (cur.indexOf(" " + directive.value + " ") < 0) {
-                el.setAttribute("class", (cur + directive.value).trim());
-              }
-              break;
-            case "style":
-              for (const key in directive.value) {
-                const value = directive.value[key];
-                el.style[key] = value;
-              }
-              break;
-            default:
-              break;
-          }
+            );
+            break;
+          case "show":
+            const originDisplay =
+              el.style.display === "none" ? "" : el.style.display;
+            el.style.display = this[directive.exp] ? originDisplay : "none";
+            break;
+          case "html":
+            el.innerHTML = directive.value;
+            break;
+          case "class":
+            const cur = " " + (el.getAttribute("class") || "") + " ";
+            if (cur.indexOf(" " + directive.value + " ") < 0) {
+              el.setAttribute("class", (cur + directive.value).trim());
+            }
+            break;
+          case "style":
+            for (const key in directive.value) {
+              const value = directive.value[key];
+              el.style[key] = value;
+            }
+            break;
+          default:
+            break;
         }
       });
     }
@@ -185,8 +178,8 @@ export function updateChildren(parentElm, oldCh, newCh) {
         oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
       }
       idxInOld = isDef(newStartVnode.key)
-          ? oldKeyToIdx[newStartVnode.key]
-          : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);
+        ? oldKeyToIdx[newStartVnode.key]
+        : findIdxInOld(newStartVnode, oldCh, oldStartIdx, oldEndIdx);
       if (isUndef(idxInOld)) {
         parentElm.insertBefore(createElement(newStartVnode), oldStartVnode.$el);
       } else {
@@ -197,8 +190,8 @@ export function updateChildren(parentElm, oldCh, newCh) {
           parentElm.insertBefore(vnodeToMove.$el, oldStartVnode.$el);
         } else {
           parentElm.insertBefore(
-              createElement(newStartVnode),
-              oldStartVnode.$el
+            createElement(newStartVnode),
+            oldStartVnode.$el
           );
         }
       }
@@ -219,9 +212,9 @@ function directivesDiff(directives, oldVnode, oldData) {
     switch (directive.name) {
       case "show":
         const originDisplay =
-            oldVnode.$el.style.display === "none"
-                ? ""
-                : oldVnode.$el.style.display;
+          oldVnode.$el.style.display === "none"
+            ? ""
+            : oldVnode.$el.style.display;
         oldVnode.$el.style.display = directive.value ? originDisplay : "none";
 
         break;

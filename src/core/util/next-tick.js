@@ -1,4 +1,4 @@
-import { isNative, isIE, isIOS, noop } from "./index";
+import { isNative, isIE, isIOS } from "./index";
 
 let isUsingMicroTask = false;
 let callbacks = [];
@@ -22,10 +22,10 @@ if (typeof Promise !== "undefined" && isNative(Promise)) {
   };
   isUsingMicroTask = true;
 } else if (
-    !isIE &&
-    typeof MutationObserver !== "undefined" &&
-    (isNative(MutationObserver) ||
-        MutationObserver.toString() === "[object MutationObserverConstructor]")
+  !isIE &&
+  typeof MutationObserver !== "undefined" &&
+  (isNative(MutationObserver) ||
+    MutationObserver.toString() === "[object MutationObserverConstructor]")
 ) {
   let counter = 1;
   let observer = new MutationObserver(flushCallbacks);
